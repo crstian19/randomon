@@ -4,7 +4,7 @@
 ![Go Version](https://img.shields.io/github/go-mod/go-version/crstian19/randomon?style=for-the-badge&logo=go&logoColor=white&label=go)
 ![License](https://img.shields.io/github/license/crstian19/randomon?style=for-the-badge&logo=unlicense&logoColor=white)
 
-<img src="https://gif.crstian.me/randomon-nobg.png" alt="Randomon Repository Image" width="800"/>
+<img src="https://gif.crstian.me/randomon-nobg.png" alt="Randomon Repository Image" width="400"/>
 
 
 A simple HTTP service that redirects to random images.
@@ -108,7 +108,7 @@ Please open an issue or submit a pull request.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 

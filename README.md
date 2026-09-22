@@ -29,15 +29,20 @@ Randomon is a lightweight web service that, when accessed, redirects you to a ra
 
 ### Using Docker (Recommended)
 
-The latest Docker image is automatically built and available at:
+The image is built by [ko](https://ko.build) on every push to `main` and published to GHCR:
+
 ```
-ghcr.io/crstian19/randomon:latest
+ghcr.io/crstian19/randomon:main          # moving tag, follows main
+ghcr.io/crstian19/randomon:sha-<commit>  # immutable, pin this in production
 ```
 
 Run it with:
 ```bash
-docker run -p 3000:3000 ghcr.io/crstian19/randomon:latest
+docker run -p 3000:3000 ghcr.io/crstian19/randomon:main
 ```
+
+The image is distroless, runs as non-root (uid 65532) and ships for both
+`linux/amd64` and `linux/arm64`.
 
 ### Building from source
 
@@ -49,11 +54,12 @@ cd randomon
 
 2. Build and run:
 ```bash
-go build -o randomon main.go
+go build -o randomon .
 ./randomon
 ```
 
-The service will start on port 3000.
+The service will start on port 3000. With [just](https://github.com/casey/just)
+installed, `just dev` does the same thing.
 
 ## Usage examples
 
@@ -89,11 +95,28 @@ fmt.Println("Random image URL:", finalURL)
 
 ## Configuration
 
-Currently, the images are hardcoded in the `main.go` file. To customize the image collection:
+All configuration is done through environment variables.
 
-1. Edit the `images` slice in `main.go`
-2. Rebuild the application
-3. Deploy your updated version
+| Variable | Default | Description |
+|---|---|---|
+| `RANDOMON_ADDR` | `:3000` | Address the public HTTP server listens on |
+| `RANDOMON_METRICS_ADDR` | `:9090` | Address the internal metrics server listens on |
+| `LOG_LEVEL` | `INFO` | Log verbosity: `DEBUG`, `INFO`, `WARN`, `ERROR` |
+| `RANDOMON_IMAGES` | built-in list | Whitespace-separated image URLs. Overrides the built-in pool without rebuilding. Each entry must be an absolute `http`/`https` URL — the service refuses to start otherwise. |
+
+```bash
+RANDOMON_IMAGES="https://example.com/a.gif https://example.com/b.gif" ./randomon
+```
+
+To change the built-in pool instead, edit `defaultImages` in `images.go` and rebuild.
+
+## Endpoints
+
+| Path | Description |
+|---|---|
+| `/` | `302` redirect to a random image (any other path behaves the same) |
+| `/healthz` | Liveness/readiness probe, returns `200 ok` |
+| `/metrics` | Prometheus metrics, including `randomon_redirects_total`. Served on `METRICS_ADDR` (`:9090`), **not** on the public port. |
 
 ## Contributing
 
@@ -105,6 +128,9 @@ Contributions are welcome! Feel free to:
 - Enhance documentation
 
 Please open an issue or submit a pull request.
+
+Before committing, run `just setup` once to install the git hooks. `just lint`
+and `just test` are what CI runs.
 
 ## License
 

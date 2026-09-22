@@ -1,0 +1,38 @@
+version: "2"
+
+# errcheck, govet, ineffassign, staticcheck and unused are enabled by default in v2.
+linters:
+  enable:
+    # Correctness
+    - bodyclose
+    - copyloopvar
+    - errorlint
+    - nilerr
+    - noctx
+    # Security
+    - gosec
+    # Style
+    - gocritic
+    - misspell
+    - revive
+    - unconvert
+    - unparam
+    - wastedassign
+    # Performance
+    - prealloc
+
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters: [gosec, unparam]
+
+formatters:
+  enable:
+    - gofumpt
+    - gci
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/crstian19/randomon)

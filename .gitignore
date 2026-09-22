@@ -1,0 +1,6 @@
+# Build output
+/bin/
+/randomon
+
+# Local env
+.env

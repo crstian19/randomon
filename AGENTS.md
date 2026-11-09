@@ -55,8 +55,24 @@ One file per responsibility — the repo is small enough not to need packages.
 | `/healthz` | Liveness/readiness probe |
 | `/metrics` | Prometheus metrics — **port 9090 only**, never the public port |
 
+## Releases
+
+[releaser-pleaser](https://github.com/apricote/releaser-pleaser) keeps a release PR
+open with the next version and `CHANGELOG.md`, computed from the Conventional
+Commits on `main`. Merging it tags `vX.Y.Z`, and the tag publishes the image.
+`feat` bumps the minor, `fix` the patch, `!` the major; `chore`, `ci`, `docs`
+and the rest do not cut a release on their own.
+
+Renovate commits Go module and toolchain updates as `fix(deps)`, so they ship
+in the next patch release; CI and tooling updates are `chore(deps)`.
+
+The workflow authenticates as the `crstian19-releaser` GitHub App (secrets
+`RELEASER_APP_CLIENT_ID` and `RELEASER_APP_PRIVATE_KEY`): a tag pushed with
+`GITHUB_TOKEN` would not trigger CI.
+
 ## Deployment
 
-This repo only builds and publishes the container image to GHCR on every push to
-`main`. Rolling it out is handled separately by GitOps from a private
+This repo only builds and publishes the container image to GHCR: `main` and
+`sha-<commit>` on every push to `main`, and the bare version (`1.2.3`) on every
+release. Rolling it out is handled separately by GitOps from a private
 infrastructure repo, so there is nothing to deploy from here.

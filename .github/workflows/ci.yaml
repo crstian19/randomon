@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: ["main"]
+    tags: ["v*"]
   pull_request:
 
 permissions:
@@ -51,7 +52,7 @@ jobs:
   publish:
     name: Build and push image
     needs: [lint, test, secrets]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -67,12 +68,18 @@ jobs:
       # ghcr.io/<owner>/<repo>, which is exactly what --bare needs.
       - uses: ko-build/setup-ko@61b4d1d396f5b2e7d6bb6fefdce3dc38d1a13445 # v0.10
       - name: Build and push (distroless, multi-arch, digest-pinned base)
-        # Two tags: "main" keeps the current deployment working, the commit SHA
-        # gives something immutable to pin to in the GitOps repo.
+        # On main: "main" keeps the current deployment working and sha-<commit>
+        # is an immutable tag. On a release tag (vX.Y.Z, pushed by
+        # releaser-pleaser): the bare version, which is what Renovate follows.
         run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            tags="${GITHUB_REF_NAME#v}"
+          else
+            tags="main,sha-${GITHUB_SHA::7}"
+          fi
           ko build --bare \
             --platform=linux/amd64,linux/arm64 \
-            --tags=main,sha-${GITHUB_SHA::7} \
+            --tags="$tags" \
             --image-refs=image-refs.txt \
             .
           echo "Published: $(cat image-refs.txt)"

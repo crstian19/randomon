@@ -29,11 +29,12 @@ Randomon is a lightweight web service that, when accessed, redirects you to a ra
 
 ### Using Docker (Recommended)
 
-The image is built by [ko](https://ko.build) on every push to `main` and published to GHCR:
+The image is built by [ko](https://ko.build) and published to GHCR:
 
 ```
+ghcr.io/crstian19/randomon:1.2.3         # each release, pin this in production
 ghcr.io/crstian19/randomon:main          # moving tag, follows main
-ghcr.io/crstian19/randomon:sha-<commit>  # immutable, pin this in production
+ghcr.io/crstian19/randomon:sha-<commit>  # immutable, one per commit on main
 ```
 
 Run it with:
